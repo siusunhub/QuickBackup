@@ -18,6 +18,10 @@ QuickBackup is a small Windows Forms utility for monitoring folders and keeping 
 - Optional current-user autorun at Windows startup.
 - Tray icon support with open and exit menu actions.
 - Auto-start monitoring when valid settings already exist.
+- Validate source and destination folders before monitoring starts.
+- Show per-row status lights with hover tooltips.
+- Lock row editing while monitoring is running.
+- Keep the main window non-maximizable for a compact tray-style workflow.
 
 ## Example Use Case
 
@@ -40,6 +44,29 @@ _yyyyMMdd_HHmmss_random6_originalfilename
 ```
 
 When a directory is deleted from the source, all files inside the matching destination directory are moved into `.quickbackup`. Subfolders are not recreated inside `.quickbackup`; all backup files are stored flat in that folder.
+
+## Row Status
+
+Each setting row has a status light at the left:
+
+- Green: monitoring is running for this row.
+- Yellow: row is ready, stopped, or not configured.
+- Red: row has an error, such as an empty path, missing folder, or matching source and destination paths.
+
+Hover over the status light to see the current row message.
+
+## Start Validation
+
+QuickBackup will not start monitoring unless at least one valid path pair is configured. A valid row requires:
+
+- `From path` is not empty.
+- `To path` is not empty.
+- `From path` and `To path` are not the same folder.
+- Both folders already exist.
+
+If autorun is enabled but validation fails at startup, QuickBackup shows the main window and does not start monitoring.
+
+While monitoring is running, row editing is locked. The source path, destination path, browse buttons, backup checkbox, add button, and remove buttons are disabled until monitoring is stopped.
 
 ## Settings File
 

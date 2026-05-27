@@ -541,7 +541,7 @@ namespace quickbackup
         {
             return !string.IsNullOrWhiteSpace(setting.FromPath)
                 && !string.IsNullOrWhiteSpace(setting.ToPath)
-                && !PathsAreSame(setting.FromPath, setting.ToPath);
+                && !PathsOverlap(setting.FromPath, setting.ToPath);
         }
 
         private bool TryValidateStart(out string message)
@@ -595,9 +595,9 @@ namespace quickbackup
                 return false;
             }
 
-            if (PathsAreSame(setting.FromPath, setting.ToPath))
+            if (PathsOverlap(setting.FromPath, setting.ToPath))
             {
-                message = "From path and To path cannot be the same.";
+                message = "From path and To path cannot be the same or inside each other.";
                 return false;
             }
 
@@ -616,16 +616,25 @@ namespace quickbackup
             return true;
         }
 
-        private static bool PathsAreSame(string first, string second)
+        private static bool PathsOverlap(string first, string second)
         {
             try
             {
-                return string.Equals(Path.GetFullPath(first).TrimEnd('\\'), Path.GetFullPath(second).TrimEnd('\\'), StringComparison.OrdinalIgnoreCase);
+                string firstPath = NormalizeDirectoryPath(first);
+                string secondPath = NormalizeDirectoryPath(second);
+                return string.Equals(firstPath, secondPath, StringComparison.OrdinalIgnoreCase)
+                    || firstPath.StartsWith(secondPath + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase)
+                    || secondPath.StartsWith(firstPath + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase);
             }
             catch
             {
                 return string.Equals(first.TrimEnd('\\'), second.TrimEnd('\\'), StringComparison.OrdinalIgnoreCase);
             }
+        }
+
+        private static string NormalizeDirectoryPath(string path)
+        {
+            return Path.GetFullPath(path).TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
         }
 
         private void LoadSettings()

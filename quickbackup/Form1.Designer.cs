@@ -118,23 +118,23 @@
             lblLogKeepDaysUnit.Location = new Point(444, 10);
             lblLogKeepDaysUnit.Margin = new Padding(3, 10, 8, 0);
             lblLogKeepDaysUnit.Name = "lblLogKeepDaysUnit";
-            lblLogKeepDaysUnit.Size = new Size(45, 25);
+            lblLogKeepDaysUnit.Size = new Size(49, 25);
             lblLogKeepDaysUnit.TabIndex = 6;
             lblLogKeepDaysUnit.Text = "days";
             // 
             // lblBackupKeepDays
             // 
             lblBackupKeepDays.AutoSize = true;
-            lblBackupKeepDays.Location = new Point(500, 10);
+            lblBackupKeepDays.Location = new Point(504, 10);
             lblBackupKeepDays.Margin = new Padding(3, 10, 0, 0);
             lblBackupKeepDays.Name = "lblBackupKeepDays";
-            lblBackupKeepDays.Size = new Size(126, 25);
+            lblBackupKeepDays.Size = new Size(116, 25);
             lblBackupKeepDays.TabIndex = 7;
             lblBackupKeepDays.Text = "Backup keep:";
             // 
             // numBackupKeepDays
             // 
-            numBackupKeepDays.Location = new Point(629, 4);
+            numBackupKeepDays.Location = new Point(623, 4);
             numBackupKeepDays.Margin = new Padding(3, 4, 8, 0);
             numBackupKeepDays.Maximum = new decimal(new int[] { 14, 0, 0, 0 });
             numBackupKeepDays.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
@@ -146,17 +146,18 @@
             // lblBackupKeepDaysUnit
             // 
             lblBackupKeepDaysUnit.AutoSize = true;
-            lblBackupKeepDaysUnit.Location = new Point(696, 10);
+            lblBackupKeepDaysUnit.Location = new Point(690, 10);
             lblBackupKeepDaysUnit.Margin = new Padding(3, 10, 8, 0);
             lblBackupKeepDaysUnit.Name = "lblBackupKeepDaysUnit";
-            lblBackupKeepDaysUnit.Size = new Size(45, 25);
+            lblBackupKeepDaysUnit.Size = new Size(49, 25);
             lblBackupKeepDaysUnit.TabIndex = 9;
             lblBackupKeepDaysUnit.Text = "days";
             // 
             // chkAutorun
             // 
             chkAutorun.AutoSize = true;
-            chkAutorun.Location = new Point(752, 8);
+            topPanel.SetFlowBreak(chkAutorun, true);
+            chkAutorun.Location = new Point(750, 8);
             chkAutorun.Margin = new Padding(3, 8, 3, 0);
             chkAutorun.Name = "chkAutorun";
             chkAutorun.Size = new Size(181, 29);
@@ -167,7 +168,7 @@
             // lblStatus
             // 
             lblStatus.AutoSize = true;
-            lblStatus.Location = new Point(720, 10);
+            lblStatus.Location = new Point(3, 48);
             lblStatus.Margin = new Padding(3, 10, 3, 0);
             lblStatus.Name = "lblStatus";
             lblStatus.Size = new Size(64, 25);
@@ -188,7 +189,6 @@
             topPanel.Controls.Add(lblBackupKeepDaysUnit);
             topPanel.Controls.Add(chkAutorun);
             topPanel.Controls.Add(lblStatus);
-            topPanel.SetFlowBreak(chkAutorun, true);
             topPanel.Dock = DockStyle.Top;
             topPanel.Location = new Point(0, 0);
             topPanel.Name = "topPanel";
@@ -245,7 +245,7 @@
             MaximizeBox = false;
             MinimumSize = new Size(760, 260);
             Name = "Form1";
-            Text = "QuickBackup 0.1";
+            Text = "QuickBackup 0.2";
             ((System.ComponentModel.ISupportInitialize)numLogKeepDays).EndInit();
             ((System.ComponentModel.ISupportInitialize)numBackupKeepDays).EndInit();
             topPanel.ResumeLayout(false);

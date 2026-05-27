@@ -6,7 +6,7 @@ namespace quickbackup
 {
     public partial class Form1 : Form
     {
-        private const string AppVersion = "0.1";
+        private const string AppVersion = "0.2";
         private const int DefaultLogKeepDays = 7;
         private const int DefaultBackupKeepDays = 3;
         private const int MinKeepDays = 1;

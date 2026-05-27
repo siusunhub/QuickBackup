@@ -31,6 +31,8 @@ namespace quickbackup
         private bool autoStartOnLoad;
         private bool initialAutoStartHandled;
         private bool loadingSettings;
+        private bool storageWarningShown;
+        private bool logWriteWarningShown;
         private int memoryCollectionRunning;
         private string lastActionMessage = "Ready";
 
@@ -73,6 +75,7 @@ namespace quickbackup
             backupCleanupTimer.Start();
 
             LoadSettings();
+            CheckStorageWritable();
             PurgeOldLogLines(true);
             CleanupBackupFolders();
             RenderRows();
@@ -680,8 +683,36 @@ namespace quickbackup
             }
             catch (Exception ex)
             {
-                Log($"Could not save config: {ex.Message}");
+                string message = $"Could not save settings file. Check write permission for: {AppContext.BaseDirectory}. {ex.Message}";
+                SetLastAction(message);
+                ShowStorageWarning(message);
+                TryWriteLogLine($"{DateTime.Now:yyyy-MM-dd HH:mm:ss} {message}");
             }
+        }
+
+        private void CheckStorageWritable()
+        {
+            string testPath = Path.Combine(AppContext.BaseDirectory, ".quickbackup_write_test.tmp");
+            try
+            {
+                File.WriteAllText(testPath, "test");
+                File.Delete(testPath);
+            }
+            catch (Exception ex)
+            {
+                ShowStorageWarning($"QuickBackup cannot write to its executable folder: {AppContext.BaseDirectory}{Environment.NewLine}{Environment.NewLine}Settings and logs may not be saved. If installed under Program Files, run as administrator or move QuickBackup to a writable folder.{Environment.NewLine}{Environment.NewLine}{ex.Message}");
+            }
+        }
+
+        private void ShowStorageWarning(string message)
+        {
+            if (storageWarningShown)
+            {
+                return;
+            }
+
+            storageWarningShown = true;
+            MessageBox.Show(message, "QuickBackup storage warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
         }
 
         private void SaveRetentionSettings()
@@ -719,18 +750,46 @@ namespace quickbackup
         {
             SetLastAction(message);
             string line = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss} {message}";
+            if (TryWriteLogLine(line))
+            {
+                try
+                {
+                    PurgeOldLogLines(false);
+                }
+                catch (Exception ex)
+                {
+                    ShowLogWarning($"Could not purge log file: {ex.Message}");
+                }
+            }
+        }
+
+        private bool TryWriteLogLine(string line)
+        {
             try
             {
                 lock (logLock)
                 {
                     File.AppendAllText(logPath, line + Environment.NewLine);
-                    PurgeOldLogLines(false);
                 }
+                return true;
             }
-            catch
+            catch (Exception ex)
             {
-                // Logging must not stop file monitoring.
+                ShowLogWarning($"Could not write log file. Check write permission for: {AppContext.BaseDirectory}. {ex.Message}");
+                return false;
             }
+        }
+
+        private void ShowLogWarning(string message)
+        {
+            if (logWriteWarningShown)
+            {
+                return;
+            }
+
+            logWriteWarningShown = true;
+            SetLastAction(message);
+            BeginInvoke((Action)(() => MessageBox.Show(message, "QuickBackup log warning", MessageBoxButtons.OK, MessageBoxIcon.Warning)));
         }
 
         private void SetLastAction(string message)
@@ -755,12 +814,19 @@ namespace quickbackup
         private void ShowLogWindow()
         {
             string content = "";
-            lock (logLock)
+            try
             {
-                if (File.Exists(logPath))
+                lock (logLock)
                 {
-                    content = File.ReadAllText(logPath);
+                    if (File.Exists(logPath))
+                    {
+                        content = File.ReadAllText(logPath);
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                content = $"Could not read log file: {ex.Message}";
             }
 
             Form logForm = new()

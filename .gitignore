@@ -9,3 +9,5 @@ publish/
 *.suo
 *.userosscache
 *.sln.docstates
+*.ico
+*.png

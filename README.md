@@ -114,25 +114,6 @@ HKCU\Software\Microsoft\Windows\CurrentVersion\Run\QuickBackup
 
 Unchecking the option removes that registry value.
 
-## Build
-
-Requirements:
-
-- Windows
-- .NET SDK with Windows Forms support
-
-Build:
-
-```powershell
-dotnet build
-```
-
-If the application is already running and locking the generated executable during development, this build command can still verify the code:
-
-```powershell
-dotnet build /p:UseAppHost=false
-```
-
 ## Notes
 
 - QuickBackup is intended for local folder backup/sync workflows.

@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using System.Diagnostics;
 using System.Text.Json;
 using Microsoft.Win32;
 
@@ -6,7 +7,7 @@ namespace quickbackup
 {
     public partial class Form1 : Form
     {
-        private const string AppVersion = "0.22";
+        private const string AppVersion = "0.24";
         private const int DefaultLogKeepDays = 7;
         private const int DefaultBackupKeepDays = 3;
         private const int MinKeepDays = 1;
@@ -217,6 +218,7 @@ namespace quickbackup
                 Margin = new Padding(0)
             };
             removeButton.Click += (_, _) => RemoveRow(setting);
+            statusToolTip.SetToolTip(removeButton, "Remove Backup Path");
             row.Controls.Add(removeButton, 4, 0);
             settingRows[setting.Id] = row;
             rowsPanel.Controls.Add(row);
@@ -243,7 +245,11 @@ namespace quickbackup
                     textBox.ReadOnly = !enabled;
                     textBox.TabStop = enabled;
                 }
-                else if (child is Button or CheckBox)
+                else if (child is Button button)
+                {
+                    button.Enabled = button.Name == "openPathButton" || enabled;
+                }
+                else if (child is CheckBox)
                 {
                     child.Enabled = enabled;
                 }
@@ -385,6 +391,16 @@ namespace quickbackup
                 Width = 34,
                 Margin = new Padding(0)
             };
+            Button openButton = new()
+            {
+                Text = "O",
+                Name = "openPathButton",
+                Dock = DockStyle.Right,
+                Width = 34,
+                Margin = new Padding(0)
+            };
+            statusToolTip.SetToolTip(browseButton, "Select Folder");
+            statusToolTip.SetToolTip(openButton, "Open in Explorer");
 
             textBox.Leave += (_, _) =>
             {
@@ -418,9 +434,22 @@ namespace quickbackup
                     SetPathValue(setting, isSource, dialog.SelectedPath);
                 }
             };
+            openButton.Click += (_, _) =>
+            {
+                string path = textBox.Text.Trim();
+                if (EnsureDirectoryExists(path, out string message))
+                {
+                    Process.Start(new ProcessStartInfo(path) { UseShellExecute = true });
+                }
+                else if (!string.IsNullOrEmpty(message))
+                {
+                    MessageBox.Show(message, "QuickBackup", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+            };
 
             panel.Controls.Add(textBox);
             panel.Controls.Add(browseButton);
+            panel.Controls.Add(openButton);
             return panel;
         }
 
@@ -449,7 +478,7 @@ namespace quickbackup
 
         private void StartMonitoring()
         {
-            if (!TryValidateStart(out string message))
+            if (!TryValidateStart(out string message, createMissingDirectories: true))
             {
                 UpdateAllSettingStatuses();
                 SetLastAction(message);
@@ -546,7 +575,7 @@ namespace quickbackup
                 && !PathsOverlap(setting.FromPath, setting.ToPath);
         }
 
-        private bool TryValidateStart(out string message)
+        private bool TryValidateStart(out string message, bool createMissingDirectories = false)
         {
             message = "";
             List<CopySetting> configuredSettings = settings
@@ -560,9 +589,23 @@ namespace quickbackup
 
             foreach (CopySetting setting in configuredSettings)
             {
-                if (!TryValidateConfiguredSetting(setting, out message))
+                if (!TryValidateConfiguredSetting(setting, out message, requireDirectories: !createMissingDirectories))
                 {
                     return false;
+                }
+            }
+
+            if (createMissingDirectories)
+            {
+                foreach (string path in configuredSettings
+                    .SelectMany(setting => new[] { setting.FromPath, setting.ToPath })
+                    .Select(path => path.Trim())
+                    .Distinct(StringComparer.OrdinalIgnoreCase))
+                {
+                    if (!EnsureDirectoryExists(path, out message))
+                    {
+                        return false;
+                    }
                 }
             }
 
@@ -575,7 +618,7 @@ namespace quickbackup
             return true;
         }
 
-        private bool TryValidateConfiguredSetting(CopySetting setting, out string message)
+        private bool TryValidateConfiguredSetting(CopySetting setting, out string message, bool requireDirectories = true)
         {
             message = "";
             bool hasFromPath = !string.IsNullOrWhiteSpace(setting.FromPath);
@@ -603,19 +646,51 @@ namespace quickbackup
                 return false;
             }
 
-            if (!Directory.Exists(setting.FromPath))
+            if (requireDirectories && !Directory.Exists(setting.FromPath))
             {
                 message = $"From path does not exist: {setting.FromPath}";
                 return false;
             }
 
-            if (!Directory.Exists(setting.ToPath))
+            if (requireDirectories && !Directory.Exists(setting.ToPath))
             {
                 message = $"To path does not exist: {setting.ToPath}";
                 return false;
             }
 
             return true;
+        }
+
+        private bool EnsureDirectoryExists(string path, out string message)
+        {
+            message = "";
+            if (string.IsNullOrWhiteSpace(path))
+            {
+                message = "Path is empty.";
+                return false;
+            }
+
+            if (Directory.Exists(path))
+            {
+                return true;
+            }
+
+            if (MessageBox.Show($"The folder does not exist:\n\n{path}\n\nCreate it?", "Create folder", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
+            {
+                message = $"Folder was not created: {path}";
+                return false;
+            }
+
+            try
+            {
+                Directory.CreateDirectory(path);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                message = $"Could not create folder: {path}\n\n{ex.Message}";
+                return false;
+            }
         }
 
         private static bool PathsOverlap(string first, string second)

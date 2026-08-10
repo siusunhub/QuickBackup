@@ -1,3 +1,7 @@
+using System;
+using System.Threading;
+using System.Windows;
+
 namespace quickbackup
 {
     internal static class Program
@@ -10,16 +14,17 @@ namespace quickbackup
             using Mutex mutex = new(true, MutexName, out bool createdNew);
             if (!createdNew)
             {
-                MessageBox.Show(
+                System.Windows.MessageBox.Show(
                     "QuickBackup is already running.",
                     "QuickBackup",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Information);
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Information);
                 return;
             }
 
-            ApplicationConfiguration.Initialize();
-            Application.Run(new Form1());
+            App app = new();
+            app.InitializeComponent();
+            app.Run();
         }
     }
 }

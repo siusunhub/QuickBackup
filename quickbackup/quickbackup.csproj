@@ -4,7 +4,9 @@
     <OutputType>WinExe</OutputType>
     <TargetFramework>net10.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
+    <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
+    <StartupObject>quickbackup.Program</StartupObject>
     <ImplicitUsings>enable</ImplicitUsings>
     <AssemblyName>QuickBackup</AssemblyName>
     <RootNamespace>quickbackup</RootNamespace>
@@ -14,13 +16,16 @@
     <ApplicationIcon>database-management.ico</ApplicationIcon>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
     <PublishSingleFile>true</PublishSingleFile>
+    <PublishDir>..\publish\</PublishDir>
     <SelfContained>false</SelfContained>
     <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
-    <Version>0.24</Version>
+    <Version>0.30</Version>
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="database-management.ico" />
+    <Content Include="database-management.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>

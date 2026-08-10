@@ -1,0 +1,122 @@
+<Window x:Class="quickbackup.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="QuickBackup 0.30" Height="500" Width="1038" MinHeight="260" MinWidth="760"
+        WindowStartupLocation="CenterScreen" Background="#F8F9FA">
+
+    <Window.Resources>
+        <Style TargetType="Button" x:Key="ModernButton">
+            <Setter Property="Background" Value="#E9ECEF"/>
+            <Setter Property="Foreground" Value="#212529"/>
+            <Setter Property="BorderBrush" Value="#CED4DA"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="10,4"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border" Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="4">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#DEE2E6"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#CED4DA"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="border" Property="Opacity" Value="0.5"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style TargetType="Button" x:Key="PrimaryButton" BasedOn="{StaticResource ModernButton}">
+            <Setter Property="Background" Value="#2B8A3E"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderBrush" Value="#297A37"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#297A37"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style TargetType="Button" x:Key="DangerButton" BasedOn="{StaticResource ModernButton}">
+            <Setter Property="Background" Value="#C92A2A"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderBrush" Value="#B02525"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#B02525"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Top Panel Toolbar -->
+        <Border Grid.Row="0" Background="White" BorderBrush="#E9ECEF" BorderThickness="0,0,0,1" Padding="12,10">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <StackPanel Grid.Row="0" Orientation="Horizontal" VerticalAlignment="Center">
+                    <Button x:Name="btnAdd" Content="+" Width="36" Height="32" Style="{StaticResource ModernButton}" FontSize="16" Click="BtnAdd_Click" Margin="0,0,8,0"/>
+                    <Button x:Name="btnStart" Content="START" Width="80" Height="32" Style="{StaticResource PrimaryButton}" Click="BtnStart_Click" Margin="0,0,8,0"/>
+                    <Button x:Name="btnStop" Content="STOP" Width="80" Height="32" Style="{StaticResource DangerButton}" IsEnabled="False" Click="BtnStop_Click" Margin="0,0,8,0"/>
+                    <Button x:Name="btnLog" Content="log" Width="60" Height="32" Style="{StaticResource ModernButton}" Click="BtnLog_Click" Margin="0,0,16,0"/>
+
+                    <TextBlock Text="Log keep:" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#495057" FontWeight="Medium"/>
+                    <ComboBox x:Name="cmbLogKeepDays" Width="60" Height="30" VerticalContentAlignment="Center" SelectionChanged="CmbRetention_SelectionChanged" Margin="0,0,4,0"/>
+                    <TextBlock Text="days" VerticalAlignment="Center" Margin="0,0,16,0" Foreground="#495057"/>
+
+                    <TextBlock Text="Backup keep:" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#495057" FontWeight="Medium"/>
+                    <ComboBox x:Name="cmbBackupKeepDays" Width="60" Height="30" VerticalContentAlignment="Center" SelectionChanged="CmbRetention_SelectionChanged" Margin="0,0,4,0"/>
+                    <TextBlock Text="days" VerticalAlignment="Center" Margin="0,0,16,0" Foreground="#495057"/>
+
+                    <CheckBox x:Name="chkAutorun" Content="autorun at startup" VerticalAlignment="Center" Margin="8,0,0,0" Checked="ChkAutorun_CheckedChanged" Unchecked="ChkAutorun_CheckedChanged"/>
+                </StackPanel>
+
+                <TextBlock x:Name="lblStatus" Grid.Row="1" Text="Status: ready" Margin="4,10,0,0" Foreground="#495057" FontWeight="SemiBold"/>
+            </Grid>
+        </Border>
+
+        <!-- Header Row -->
+        <Border Grid.Row="1" Background="#E9ECEF" Padding="12,6" BorderBrush="#CED4DA" BorderThickness="0,0,0,1">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="38"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="105"/>
+                    <ColumnDefinition Width="52"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="" ToolTipService.ToolTip="Status"/>
+                <TextBlock Grid.Column="1" Text="From path" FontWeight="Bold" Foreground="#343A40" Margin="4,0"/>
+                <TextBlock Grid.Column="2" Text="To path" FontWeight="Bold" Foreground="#343A40" Margin="4,0"/>
+                <TextBlock Grid.Column="3" Text="Backup" FontWeight="Bold" Foreground="#343A40" HorizontalAlignment="Center"/>
+                <TextBlock Grid.Column="4" Text="" HorizontalAlignment="Center"/>
+            </Grid>
+        </Border>
+
+        <!-- Dynamic Setting Rows Panel -->
+        <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+            <StackPanel x:Name="rowsPanel" Margin="12,8,12,12"/>
+        </ScrollViewer>
+    </Grid>
+</Window>

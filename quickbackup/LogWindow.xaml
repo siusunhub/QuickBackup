@@ -1,0 +1,11 @@
+<Window x:Class="quickbackup.LogWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="QuickBackup log" Height="500" Width="800"
+        WindowStartupLocation="CenterOwner">
+    <Grid Margin="10">
+        <TextBox x:Name="txtLogContent" IsReadOnly="True" TextWrapping="NoWrap"
+                 AcceptsReturn="True" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"
+                 FontFamily="Consolas, Courier New, Monospace" FontSize="12"/>
+    </Grid>
+</Window>

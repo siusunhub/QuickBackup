@@ -4,6 +4,17 @@ obj/
 publish/
 tests/
 docs/
+.agents/
+.codex/
+.claude/
+.gemini/
+.antigravity/
+.github/
+.agent/
+.claude/
+.gemini/
+.antigravity/
+.github/
 
 # Visual Studio files
 .vs/

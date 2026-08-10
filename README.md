@@ -1,6 +1,6 @@
 # QuickBackup
 
-QuickBackup is a small Windows Forms utility for monitoring folders and keeping a target folder synchronized in near real time. It is designed for simple folder-to-folder backup jobs where changed, created, renamed, and deleted files should be reflected in the destination automatically.
+QuickBackup is a small WPF utility for monitoring folders and keeping a target folder synchronized in near real time. It is designed for simple folder-to-folder backup jobs where changed, created, renamed, and deleted files should be reflected in the destination automatically.
 
 ## Features
 
